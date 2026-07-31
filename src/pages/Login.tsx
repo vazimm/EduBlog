@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { isAxiosError } from "axios";
 import { useNavigate, useLocation, type Location } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { useToast } from "../hooks/useToast";
 
 export default function Login() {
   const { login } = useAuth();
+  const { showError, showSuccess } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -21,9 +24,14 @@ export default function Login() {
     setLoading(true);
     try {
       await login(email, password);
+      showSuccess("Login realizado com sucesso!");
       navigate(from, { replace: true });
-    } catch {
-      setError("E-mail ou senha inválidos");
+    } catch (err) {
+      if (isAxiosError(err) && err.response?.status === 429) {
+        showError("Muitas tentativas. Aguarde 15 minutos e tente novamente.");
+      } else {
+        showError("E-mail ou senha inválidos");
+      }
     } finally {
       setLoading(false);
     }
