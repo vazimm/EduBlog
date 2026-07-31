@@ -1,16 +1,37 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import Home from "../pages/Home";
+import Login from "../pages/Login";
+import RequireAuth from "./RequireAuth";
 //import PostView from "../pages/PostView";
-//import Login from "../pages/Login";
+//import RequireRole from "./RequireRole";
+//import PostCreate from "../pages/PostCreate";
+//import PostEdit from "../pages/PostEdit";
+//import Admin from "../pages/Admin";
 
 const router = createBrowserRouter([
+  { path: "/login", element: <Login /> },
+
   {
-    element: <Layout />,
+    element: <RequireAuth />,
     children: [
-      { path: "/", element: <Home /> },
-      //{ path: "/posts/:id", element: <PostView /> },
-      //{ path: "/login", element: <Login /> },
+      {
+        element: <Layout />,
+        children: [
+          { path: "/", element: <Home /> },
+          //{ path: "/posts/:id", element: <PostView /> },
+
+          // Quando criar PostCreate/PostEdit/Admin, descomente este bloco:
+          // {
+          //   element: <RequireRole role="professor" />,
+          //   children: [
+          //     { path: "/posts/new", element: <PostCreate /> },
+          //     { path: "/posts/:id/edit", element: <PostEdit /> },
+          //     { path: "/admin", element: <Admin /> },
+          //   ],
+          // },
+        ],
+      },
     ],
   },
 ]);
