@@ -3,6 +3,7 @@ import Layout from "../components/layout/Layout";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import RequireAuth from "./RequireAuth";
+import NotFound from "../pages/NotFound";
 //import PostView from "../pages/PostView";
 //import RequireRole from "./RequireRole";
 //import PostCreate from "../pages/PostCreate";
@@ -19,6 +20,7 @@ const router = createBrowserRouter([
         element: <Layout />,
         children: [
           { path: "/", element: <Home /> },
+          { path: "*", element: <NotFound /> },
           //{ path: "/posts/:id", element: <PostView /> },
 
           // Quando criar PostCreate/PostEdit/Admin, descomente este bloco:
