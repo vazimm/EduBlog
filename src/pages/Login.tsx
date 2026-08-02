@@ -15,7 +15,6 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Se o usuário tentou acessar /admin sem estar logado, volta pra lá depois do login
   const from = (location.state as { from?: Location })?.from?.pathname || "/";
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
