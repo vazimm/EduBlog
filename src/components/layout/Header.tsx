@@ -1,13 +1,7 @@
 import { Link } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
+import UserMenu from "./UserMenu";
 
 export default function Header() {
-  const { logout } = useAuth();
-
-  function handleLogout() {
-    logout();
-  }
-
   return (
     <header className="bg-white text-slate-300 px-8 py-4">
       <div className="max-w-6xl mx-auto flex justify-between items-center">
@@ -21,20 +15,7 @@ export default function Header() {
         </h1>
         <nav>
           <ul className="flex space-x-4 text-black">
-            <li>
-              <Link to="/" className="hover:text-teal-500">
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/login"
-                className="hover:text-teal-500"
-                onClick={handleLogout}
-              >
-                Sair
-              </Link>
-            </li>
+            <UserMenu />
           </ul>
         </nav>
       </div>
