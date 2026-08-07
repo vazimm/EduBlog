@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
-import type { IUser, Role } from "../interfaces/IUser";
+import type { IUser } from "../interfaces/IUser";
 import { AuthContext } from "./AuthContextDefinition";
 import { loginRequest } from "../services/authService";
 
@@ -12,12 +12,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function login(email: string, password: string) {
     const { token, user } = await loginRequest(email, password);
-    // Por enquanto, define-se papel (role) com base no e-mail, só pra fins de demonstração
-    const role: Role = email.toLowerCase().endsWith("@professor.com")
-      ? "professor"
-      : "aluno";
 
-    const loggedUser: IUser = { ...user, role };
+    const loggedUser: IUser = { ...user };
 
     localStorage.setItem("user", JSON.stringify(loggedUser));
     localStorage.setItem("token", token);

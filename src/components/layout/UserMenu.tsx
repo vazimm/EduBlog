@@ -24,11 +24,11 @@ export default function UserMenu() {
         onClick={() => setOpen((prev) => !prev)}
         className="rounded-full border border-slate-300 px-4 py-1.5 text-sm hover:bg-slate-50 cursor-pointer"
       >
-        {user?.name}
+        {user?.username}
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-44 rounded-xl border border-slate-100 bg-white p-2 shadow-lg">
+        <div className="absolute right-0 mt-2 w-44 rounded-xl border border-slate-100 bg-white shadow-lg">
           <Link
             to="/perfil"
             onClick={() => setOpen(false)}
