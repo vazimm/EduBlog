@@ -1,3 +1,4 @@
+import type { RoleUsers } from "../types/roleUsers";
 import type { IUser } from "./IUser";
 
 export interface IAuthContextType {
@@ -13,7 +14,9 @@ export interface ILoginResponse {
     user: {
       id: string;
       name: string;
+      username: string;
       email: string;
+      role: RoleUsers;
     };
   };
 }
