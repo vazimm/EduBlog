@@ -1,6 +1,6 @@
-import type { Props } from "../../interfaces/IToast";
+import type { IToastProps } from "../../interfaces/IToast";
 
-export default function ToastContainer({ toasts, onClose }: Props) {
+export default function ToastContainer({ toasts, onClose }: IToastProps) {
   if (toasts.length === 0) return null;
 
   return (

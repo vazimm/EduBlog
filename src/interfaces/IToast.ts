@@ -12,7 +12,7 @@ export interface IToastContextType {
   showSuccess: (message: string) => void;
 }
 
-export interface Props {
+export interface IToastProps {
   toasts: IToast[];
   onClose: (id: string) => void;
 }
