@@ -1,22 +1,17 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type SyntheticEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useToast } from "../../hooks/useToast";
 import type { IDiscipline } from "../../interfaces/IDiscipline";
 import type { IPost } from "../../interfaces/IPost";
 import { getDisciplinesRequest } from "../../services/catalogService";
 import { getPostsRequest } from "../../services/postService";
+import type { SearchSuggestion } from "../../types/searchSuggestion";
 import { normalizeText, slugifyDisciplineLabel } from "../../utils/discipline";
 import UserMenu from "./UserMenu";
 
-type SearchSuggestion = {
-  id: string;
-  label: string;
-  description: string;
-  to: string;
-  kind: "post" | "disciplina" | "professor";
-};
-
 export default function Header() {
   const navigate = useNavigate();
+  const { showError } = useToast();
 
   const [searchValue, setSearchValue] = useState("");
   const [disciplines, setDisciplines] = useState<IDiscipline[]>([]);
@@ -111,7 +106,7 @@ export default function Header() {
     setIsSearchOpen(false);
   }
 
-  function handleSearch(formEvent: FormEvent<HTMLFormElement>) {
+  function handleSearch(formEvent: SyntheticEvent<HTMLFormElement>) {
     formEvent.preventDefault();
 
     if (!normalizedQuery) return;
@@ -122,7 +117,7 @@ export default function Header() {
       return;
     }
 
-    window.alert("Nenhum resultado encontrado para a busca.");
+    showError("Nenhum resultado encontrado para a busca.");
   }
 
   return (

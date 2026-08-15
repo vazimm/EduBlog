@@ -1,24 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
 import type { IDiscipline } from "../interfaces/IDiscipline";
 import type { IPost } from "../interfaces/IPost";
 import { getDisciplinesRequest } from "../services/catalogService";
 import { getPostsRequest } from "../services/postService";
+import { formatDate } from "../utils/date";
 import { normalizeText, slugifyDisciplineLabel } from "../utils/discipline";
 
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(value));
-}
-
 export default function Home() {
-  const { user } = useAuth();
-  void user; //Remover o void após implementaçao do uso do User
   const [posts, setPosts] = useState<IPost[]>([]);
   const [disciplines, setDisciplines] = useState<IDiscipline[]>([]);
   const [loading, setLoading] = useState(true);
