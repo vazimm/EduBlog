@@ -6,7 +6,7 @@ import { loginRequest } from "../services/authService";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<IUser | null>(() => {
-    const stored = localStorage.getItem("user");
+    const stored = sessionStorage.getItem("user");
     return stored ? JSON.parse(stored) : null;
   });
 
@@ -15,14 +15,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const loggedUser: IUser = { ...user };
 
-    localStorage.setItem("user", JSON.stringify(loggedUser));
-    localStorage.setItem("token", token);
+    sessionStorage.setItem("user", JSON.stringify(loggedUser));
+    sessionStorage.setItem("token", token);
     setUser(loggedUser);
   }
 
   function logout() {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("token");
     setUser(null);
   }
 
