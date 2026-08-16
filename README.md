@@ -1,4 +1,4 @@
-# EduBlog — Front-end
+# EduBlog
 
 Interface web do EduBlog, uma plataforma de blogging educacional que permite a professores publicar conteúdo por disciplina e a alunos consultá-lo. Este repositório contém apenas o **front-end**; o back-end (API REST) está em um repositório separado.
 
@@ -39,12 +39,13 @@ Projeto desenvolvido para o **Tech Challenge** — [nome da pós-graduação/cur
 | **React Router DOM**      | Roteamento                    | Rotas aninhadas (`Outlet`) para compor Layout, guardas de autenticação e autorização por papel                                                                       |
 | **Context API**           | Estado global de autenticação | Suficiente para o escopo do projeto; Redux seria over-engineering para um CRUD de blog                                                                               |
 | **Axios**                 | Cliente HTTP                  | Ver [Decisões de segurança](#decisões-de-segurança)                                                                                                                  |
+| **jwt-decode**            | Leitura do payload do JWT     | Permite checar a expiração do token no front-end sem depender de uma chamada à API                                                                                   |
 
 ### Sobre o controle de acesso
 
-Diferente do enunciado original (que previa listagem pública de posts), o time optou por **exigir login para acesso a qualquer página**, incluindo a listagem. Após autenticado, o papel do usuário (`professor` ou `aluno`) é inferido a partir do domínio do e-mail (`@professor.com`), espelhando a regra real de autorização implementada no back-end. Apenas professores têm acesso a criação, edição e administração de posts.
+Diferente do enunciado original (que previa listagem pública de posts), o time optou por **exigir login para acesso a qualquer página**, incluindo a listagem. Após autenticado, o papel do usuário (`PROFESSOR` ou `ALUNO`) é retornado diretamente pela API na resposta de login e convertido internamente pelo front-end (`professor`/`aluno`) para uso nas telas e nas guardas de rota.
 
-> ⚠️ Importante: a checagem de papel no front-end é apenas uma camada de **experiência de usuário** (esconder botões, bloquear rotas). A autorização real e vinculante ocorre no back-end, que valida o token JWT e o domínio do e-mail a cada requisição de escrita — o front-end nunca deve ser a única barreira de segurança.
+> ⚠️ Importante: a checagem de papel no front-end é apenas uma camada de **experiência de usuário** (esconder botões, bloquear rotas). A autorização real e vinculante ocorre no back-end, que valida o token JWT e o papel do usuário a cada requisição de escrita — o front-end nunca deve ser a única barreira de segurança.
 
 ---
 
@@ -114,13 +115,15 @@ O `Dockerfile` usa multi-stage build: um estágio de build (Node) gera os arquiv
 ```
 src/
 ├── components/
-│   └── layout/          # Header, Footer, Layout (estrutura fixa da aplicação)
-├── pages/                # Uma página = uma rota (Home, Login, PostView, Admin...)
-├── context/               # Contextos React (AuthContext e sua definição)
-├── hooks/                 # Hooks customizados (useAuth)
+│   └── layout/          # Header, Footer, Layout, UserMenu (estrutura fixa da aplicação)
+├── pages/                # Uma página = uma rota (Home, Login, ContentPlaceholder...)
+├── context/               # Contextos React (AuthContext, ToastContext e suas definições)
+├── hooks/                 # Hooks customizados (useAuth, useToast, useClickOutside)
 ├── routes/                # Configuração de rotas e guardas (RequireAuth, RequireRole)
-├── services/              # Camada de comunicação com a API (authService, postService...)
+├── services/              # Camada de comunicação com a API (authService, postService, catalogService)
 ├── interfaces/            # Tipos e interfaces TypeScript
+├── utils/                 # Funções puras reutilizáveis (formatação de data, slugs, expiração de token)
+├── types/                 # Tipos auxiliares que não representam entidades de domínio
 ├── App.tsx
 └── main.tsx
 ```
@@ -130,6 +133,7 @@ src/
 - **`pages/` vs `components/`**: se o item tem rota própria, é `pages/`; se é reutilizável dentro de páginas, é `components/`.
 - **Interfaces prefixadas com `I`** (`IUser`, `IPost`, `IAuthContextType`): convenção comum em bases vindas de C#/Java; time optou por manter para consistência interna.
 - **Arquivos de hook/contexto separados** (`AuthContextDefinition.ts`, `AuthContext.tsx`, `useAuth.ts`): necessário para compatibilidade com o Fast Refresh do Vite, que exige que cada arquivo exporte apenas um tipo de coisa (componente, ou hook, ou definição) para preservar o hot-reload sem reload completo da página.
+- **`role` em maiúsculo (`PROFESSOR`/`ALUNO`) na API, minúsculo (`professor`/`aluno`) no front-end**: a conversão acontece em um único ponto (`AuthContext.login`), evitando espalhar essa diferença de convenção pelo restante do código.
 
 ---
 
@@ -137,10 +141,15 @@ src/
 
 O controle de acesso é implementado em duas camadas independentes, usando rotas aninhadas do React Router:
 
-1. **`RequireAuth`** — verifica se existe uma sessão ativa (`isAuthenticated`). Se não, redireciona para `/login`, preservando a rota de origem para retomar a navegação após o login.
-2. **`RequireRole`** — aplicado apenas às rotas de escrita (`/posts/new`, `/posts/:id/edit`, `/admin`), verifica se o papel do usuário logado é `professor`.
+1. **`RequireAuth`** — verifica se existe uma sessão ativa (`isAuthenticated`) e se o token ainda não expirou. Se não, redireciona para `/login`, preservando a rota de origem para retomar a navegação após o login.
+2. **`RequireRole`** — aplicado apenas às rotas de escrita (`/posts/new`, `/posts/:id/edit`, `/admin`), verifica se o papel do usuário logado é `PROFESSOR`.
 
-O estado de autenticação é gerenciado via **Context API** (`AuthContext`), persistido em `localStorage` para sobreviver a recarregamentos de página, e inicializado de forma síncrona (lazy initial state do `useState`) para evitar renderizações em cascata desnecessárias.
+O estado de autenticação é gerenciado via **Context API** (`AuthContext`) e passa por duas verificações de validade:
+
+- **Na inicialização** (lazy initial state do `useState`): o token salvo é decodificado (via `jwt-decode`) e sua data de expiração é comparada com o horário atual. Um token expirado é descartado automaticamente, sem exigir nenhuma chamada à API.
+- **Em tempo real**: um interceptor de resposta do Axios (`services/api.ts`) captura qualquer resposta `401 Unauthorized` da API — cenário que ocorre quando o token expira **durante** o uso da aplicação — e força logout + redirecionamento imediato para `/login`.
+
+A sessão é armazenada em **`sessionStorage`** (não `localStorage`), uma decisão deliberada: a autenticação deve persistir durante recarregamentos de página (F5) e navegação entre abas da mesma janela, mas **não deve sobreviver ao fechamento do navegador** — exigindo login novamente na próxima abertura, mesmo que o token ainda estivesse tecnicamente válido no servidor. Essa escolha prioriza segurança sobre conveniência, adequada ao contexto de uma aplicação usada por múltiplos perfis (professores e alunos) em dispositivos potencialmente compartilhados.
 
 ---
 
@@ -157,12 +166,12 @@ Base URL configurada via `VITE_API_URL`. Principais endpoints consumidos:
 | POST   | `/posts`               | Professor    | Criação de post                          |
 | PUT    | `/posts/:id`           | Professor    | Edição de post                           |
 | DELETE | `/posts/:id`           | Professor    | Exclusão de post                         |
-| GET    | `/catalog/disciplines` | Pública      | Popula filtros e formulários             |
+| GET    | `/catalog/disciplines` | Pública      | Popula filtros, navegação e formulários  |
 | GET    | `/catalog/status`      | Pública      | Popula formulários de criação/edição     |
 
 Todas as respostas seguem o formato `{ data: ... }`; a camada `services/` é responsável por desembrulhar esse envelope antes de entregar os dados aos componentes.
 
-O token JWT retornado no login é armazenado em `localStorage` e anexado automaticamente ao cabeçalho `Authorization: Bearer <token>` em requisições subsequentes.
+O token JWT retornado no login (validade de 8 horas, definida no back-end) é armazenado em `sessionStorage` e anexado automaticamente ao cabeçalho `Authorization: Bearer <token>` em requisições subsequentes, via interceptor do Axios.
 
 ---
 
@@ -182,6 +191,13 @@ Como medida de precaução, o projeto fixa a versão exata do axios no `package.
 
 O `npm audit` reporta uma vulnerabilidade de CSRF (severidade alta) relacionada às **APIs instáveis de React Server Components (RSC)** do React Router, corrigida apenas na versão major `8.3.0+`. Como este projeto é uma **SPA client-side pura**, sem uso de RSC ou APIs `unstable_`, a vulnerabilidade **não é aplicável** ao contexto de uso atual. Optou-se por não forçar uma migração de major version (`npm audit fix --force` rebaixaria a versão em vez de corrigir de fato) sem uma avaliação deliberada das breaking changes da v8.
 
+### Expiração de sessão
+
+A sessão do usuário expira em duas situações, cobrindo tanto o uso ativo quanto o abandono da aplicação:
+
+- **Token JWT expirado** (8h após o login, validado tanto no back-end quanto no front-end via decodificação local do token e via interceptor de resposta 401).
+- **Fechamento do navegador**, já que a sessão é mantida em `sessionStorage`, não em `localStorage`.
+
 ---
 
 ## Scripts disponíveis
@@ -197,8 +213,11 @@ O `npm audit` reporta uma vulnerabilidade de CSRF (severidade alta) relacionada 
 
 ## Problemas conhecidos / próximos passos
 
-- [ ] O papel do usuário (`professor`/`aluno`) é inferido no front-end a partir do e-mail; avaliar se o back-end deve expor um campo `role` explícito na resposta de login.
 - [ ] Remover bloco de credenciais de teste da tela de login antes da entrega final.
+- [ ] Chamadas a `/posts` e `/catalog/disciplines` são feitas de forma independente pelo `Header` e pela `Home`, sem cache compartilhado — avaliar mover para um Context ou adotar uma lib de cache (React Query/SWR) em iteração futura.
+- [ ] Filtro de posts publicados compara `status.label` como string (`"Publicado"`); considerar usar um identificador mais estável (`_id` ou um campo booleano dedicado) para reduzir acoplamento com o texto exibido.
+- [ ] Páginas de criação, edição e administração de posts (`/posts/new`, `/posts/:id/edit`, `/admin`) ainda não implementadas.
+- [ ] Rotas `/perfil` e `/favoritos`, referenciadas no menu do usuário, ainda não possuem páginas implementadas.
 - [ ] [PREENCHER conforme o time avançar: comentários, paginação, upload de imagem, etc.]
 
 ---
