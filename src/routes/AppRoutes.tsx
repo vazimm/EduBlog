@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "../components/layout/Layout";
+import ContentPlaceholder from "../pages/ContentPlaceholder";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import RequireAuth from "./RequireAuth";
@@ -20,6 +21,7 @@ const router = createBrowserRouter([
         element: <Layout />,
         children: [
           { path: "/", element: <Home /> },
+          { path: "/conteudo/:disciplina", element: <ContentPlaceholder /> },
           { path: "*", element: <NotFound /> },
           //{ path: "/posts/:id", element: <PostView /> },
 

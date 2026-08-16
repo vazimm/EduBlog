@@ -2,10 +2,10 @@ import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-900 text-slate-300 px-8 py-10">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-8">
+    <footer className="mt-auto grid gap-4 bg-slate-950 px-8 py-6 text-slate-300 sm:grid-cols-3">
+      <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-8 sm:col-span-3 sm:grid-cols-3">
         <div>
-          <h3 className="text-white font-semibold mb-3">Instituição</h3>
+          <h3 className="mb-3 text-white font-semibold">Instituição</h3>
           <ul className="space-y-2">
             <li>
               <Link to="/sobre" className="hover:text-white">
@@ -26,7 +26,7 @@ export default function Footer() {
         </div>
 
         <div>
-          <h3 className="text-white font-semibold mb-3">Contato</h3>
+          <h3 className="mb-3 text-white font-semibold">Contato</h3>
           <ul className="space-y-2">
             <li>Email</li>
             <li>Telefone</li>
@@ -35,7 +35,7 @@ export default function Footer() {
         </div>
 
         <div>
-          <h3 className="text-white font-semibold mb-3">Links</h3>
+          <h3 className="mb-3 text-white font-semibold">Links</h3>
           <ul className="space-y-2">
             <li>
               <Link to="/privacidade" className="hover:text-white">
