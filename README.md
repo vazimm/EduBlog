@@ -22,6 +22,7 @@ Projeto desenvolvido para o **Tech Challenge** — [nome da pós-graduação/cur
 - [Rodando com Docker](#rodando-com-docker)
 - [Estrutura de pastas](#estrutura-de-pastas)
 - [Arquitetura de autenticação e autorização](#arquitetura-de-autenticação-e-autorização)
+- [Busca, filtros e catalogação](#busca-filtros-e-catalogação)
 - [Integração com a API](#integração-com-a-api)
 - [Decisões de segurança](#decisões-de-segurança)
 - [Scripts disponíveis](#scripts-disponíveis)
@@ -115,14 +116,17 @@ O `Dockerfile` usa multi-stage build: um estágio de build (Node) gera os arquiv
 ```
 src/
 ├── components/
-│   └── layout/          # Header, Footer, Layout, UserMenu (estrutura fixa da aplicação)
-├── pages/                # Uma página = uma rota (Home, Login, ContentPlaceholder...)
+│   ├── layout/          # Header, Footer, Layout, UserMenu (estrutura fixa da aplicação)
+│   ├── filters/         # Painel de filtros da listagem (FilterPanel, FilterCheckboxGroup)
+│   ├── posts/           # Exibição de posts (PostCard, PostListItem, PostCollection, ViewToggle)
+│   └── ui/              # Blocos de interface reutilizáveis (LoadingState, ErrorState, EmptyState, Pagination, ToastContainer)
+├── pages/                # Uma página = uma rota (Home, Login, ContentPlaceholder, Discipline, SearchResults, PostView...)
 ├── context/               # Contextos React (AuthContext, ToastContext e suas definições)
-├── hooks/                 # Hooks customizados (useAuth, useToast, useClickOutside)
+├── hooks/                 # Hooks customizados (useAuth, useToast, useClickOutside, useDebounce, usePostFilters)
 ├── routes/                # Configuração de rotas e guardas (RequireAuth, RequireRole)
 ├── services/              # Camada de comunicação com a API (authService, postService, catalogService)
 ├── interfaces/            # Tipos e interfaces TypeScript
-├── utils/                 # Funções puras reutilizáveis (formatação de data, slugs, expiração de token)
+├── utils/                 # Funções puras reutilizáveis (formatação de data, slugs, expiração de token, filtros, paginação, tempo de leitura)
 ├── types/                 # Tipos auxiliares que não representam entidades de domínio
 ├── App.tsx
 └── main.tsx

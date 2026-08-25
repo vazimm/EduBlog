@@ -1,11 +1,13 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "../components/layout/Layout";
-import ContentPlaceholder from "../pages/ContentPlaceholder";
+import Discipline from "../pages/Discipline";
 import Home from "../pages/Home";
+import PostView from "../pages/PostView";
+import SearchResults from "../pages/SearchResults";
 import Login from "../pages/Login";
 import RequireAuth from "./RequireAuth";
 import NotFound from "../pages/NotFound";
-//import PostView from "../pages/PostView";
+
 //import RequireRole from "./RequireRole";
 //import PostCreate from "../pages/PostCreate";
 //import PostEdit from "../pages/PostEdit";
@@ -21,9 +23,10 @@ const router = createBrowserRouter([
         element: <Layout />,
         children: [
           { path: "/", element: <Home /> },
-          { path: "/conteudo/:disciplina", element: <ContentPlaceholder /> },
+          { path: "/conteudo/:disciplina", element: <Discipline /> },
+          { path: "/posts/:id", element: <PostView /> },
+          { path: "/busca", element: <SearchResults /> },
           { path: "*", element: <NotFound /> },
-          //{ path: "/posts/:id", element: <PostView /> },
 
           // Quando criar PostCreate/PostEdit/Admin, descomente este bloco:
           // {

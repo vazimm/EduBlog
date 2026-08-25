@@ -127,7 +127,7 @@ export default function Home() {
                     {post.author.name} | {formatDate(post.createDate)}
                   </p>
                   <Link
-                    to={`/conteudo/${slugifyDisciplineLabel(post.discipline.label)}?post=${post._id}`}
+                    to={`/posts/${post._id}`}
                     className="w-fit rounded-[10px] bg-teal-700 px-4 py-2.5 text-sm font-semibold text-white"
                   >
                     Ler aula
