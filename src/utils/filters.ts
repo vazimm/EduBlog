@@ -3,16 +3,8 @@ import type { IFilterOption, IPostFilters } from "../interfaces/IPostFilters";
 import type { SortOrder } from "../types/sortOrder";
 import { normalizeText } from "./discipline";
 
-const seriesOrder = ["Fundamental I", "Fundamental II", "Ensino Medio"];
-const semesterOrder = ["1", "2"];
-
-function orderIndex(order: string[], value: string) {
-  return order.findIndex((item) => normalizeText(item) === normalizeText(value));
-}
-
 function buildOptions(
   values: string[],
-  order: string[],
   formatLabel: (value: string) => string = (value) => value,
 ): IFilterOption[] {
   const uniqueValues = Array.from(
@@ -21,16 +13,7 @@ function buildOptions(
 
   return uniqueValues
     .map((value) => ({ value, label: formatLabel(value) }))
-    .sort((left, right) => {
-      const leftIndex = orderIndex(order, left.value);
-      const rightIndex = orderIndex(order, right.value);
-
-      if (leftIndex !== -1 && rightIndex !== -1) return leftIndex - rightIndex;
-      if (leftIndex !== -1) return -1;
-      if (rightIndex !== -1) return 1;
-
-      return left.label.localeCompare(right.label, "pt-BR", { numeric: true });
-    });
+    .sort((left, right) => left.label.localeCompare(right.label, "pt-BR", { numeric: true }));
 }
 
 function formatSemesterLabel(value: string) {
@@ -42,25 +25,15 @@ export function isPublished(post: IPost) {
 }
 
 export function buildSeriesOptions(posts: IPost[]) {
-  return buildOptions(
-    posts.map((post) => post.series),
-    seriesOrder,
-  );
+  return buildOptions(posts.map((post) => post.series));
 }
 
 export function buildSemesterOptions(posts: IPost[]) {
-  return buildOptions(
-    posts.map((post) => post.semester),
-    semesterOrder,
-    formatSemesterLabel,
-  );
+  return buildOptions(posts.map((post) => post.semester), formatSemesterLabel);
 }
 
 export function buildProfessorOptions(posts: IPost[]) {
-  return buildOptions(
-    posts.map((post) => post.author.name),
-    [],
-  );
+  return buildOptions(posts.map((post) => post.author.name));
 }
 
 export function applyPostFilters(posts: IPost[], filters: IPostFilters) {

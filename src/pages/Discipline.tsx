@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import FilterPanel from "../components/filters/FilterPanel";
 import PostCollection from "../components/posts/PostCollection";
 import ViewToggle from "../components/posts/ViewToggle";
@@ -27,9 +27,6 @@ const postsPerPage = 6;
 
 export default function Discipline() {
   const { disciplina } = useParams<{ disciplina: string }>();
-  const [searchParams] = useSearchParams();
-  const postId = searchParams.get("post");
-
   const {
     filters,
     sortOrder,
@@ -52,8 +49,6 @@ export default function Discipline() {
   const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
-    if (postId) return;
-
     let ignore = false;
 
     async function loadCatalogData() {
@@ -85,7 +80,7 @@ export default function Discipline() {
     return () => {
       ignore = true;
     };
-  }, [postId]);
+  }, []);
 
   const discipline = useMemo(
     () => findDisciplineBySlug(disciplines, disciplina),
@@ -93,7 +88,7 @@ export default function Discipline() {
   );
 
   useEffect(() => {
-    if (postId || !discipline) return;
+    if (!discipline) return;
 
     let ignore = false;
 
@@ -123,7 +118,7 @@ export default function Discipline() {
     return () => {
       ignore = true;
     };
-  }, [discipline, filters, postId]);
+  }, [discipline, filters]);
 
   const disciplinePosts = useMemo(
     () => (discipline ? catalogPosts.filter((post) => post.discipline._id === discipline._id) : []),
@@ -143,8 +138,6 @@ export default function Discipline() {
     () => paginate(filteredPosts, page, postsPerPage),
     [filteredPosts, page],
   );
-
-  if (postId) return <Navigate to={`/posts/${postId}`} replace />;
 
   if (loading) {
     return <LoadingState message="Carregando conteúdos da disciplina..." />;

@@ -37,7 +37,7 @@ export default function FilterPanel({
           <select
             value={filters.professor}
             onChange={(e) => onProfessorChange(e.target.value)}
-            className="mt-2 w-full cursor-pointer rounded-[10px] border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-teal-700"
+            className="mt-2 w-full cursor-pointer rounded-[10px] border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition [color-scheme:light] focus:border-teal-700"
           >
             <option value="">Todos</option>
             {professorOptions.map((option) => (

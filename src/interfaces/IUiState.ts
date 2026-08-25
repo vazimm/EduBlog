@@ -21,7 +21,3 @@ export interface IPaginationProps {
   totalPages: number;
   onPageChange: (page: number) => void;
 }
-
-export interface IContentPlaceholderProps {
-  title: string;
-}
