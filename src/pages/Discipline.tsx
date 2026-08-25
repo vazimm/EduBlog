@@ -10,11 +10,12 @@ import { usePostFilters } from "../hooks/usePostFilters";
 import type { IDiscipline } from "../interfaces/IDiscipline";
 import type { IPost } from "../interfaces/IPost";
 import { getDisciplinesRequest } from "../services/catalogService";
-import { getPostsRequest } from "../services/postService";
+import { getPostsRequest, searchPostsRequest } from "../services/postService";
 import { findDisciplineBySlug } from "../utils/discipline";
 import {
   applyPostFilters,
   buildProfessorOptions,
+  buildSearchParams,
   buildSemesterOptions,
   buildSeriesOptions,
   isPublished,
@@ -43,9 +44,11 @@ export default function Discipline() {
     clearFilters,
   } = usePostFilters();
 
-  const [posts, setPosts] = useState<IPost[]>([]);
+  const [catalogPosts, setCatalogPosts] = useState<IPost[]>([]);
   const [disciplines, setDisciplines] = useState<IDiscipline[]>([]);
+  const [results, setResults] = useState<IPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searching, setSearching] = useState(false);
   const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
@@ -53,7 +56,7 @@ export default function Discipline() {
 
     let ignore = false;
 
-    async function loadDisciplineData() {
+    async function loadCatalogData() {
       try {
         setLoading(true);
         setLoadError("");
@@ -65,7 +68,7 @@ export default function Discipline() {
 
         if (ignore) return;
 
-        setPosts(postsResponse.filter(isPublished));
+        setCatalogPosts(postsResponse.filter(isPublished));
         setDisciplines(disciplinesResponse.filter((discipline) => discipline.isActive));
       } catch {
         if (ignore) return;
@@ -77,7 +80,7 @@ export default function Discipline() {
       }
     }
 
-    void loadDisciplineData();
+    void loadCatalogData();
 
     return () => {
       ignore = true;
@@ -89,9 +92,42 @@ export default function Discipline() {
     [disciplines, disciplina],
   );
 
+  useEffect(() => {
+    if (postId || !discipline) return;
+
+    let ignore = false;
+
+    async function loadResults() {
+      try {
+        setSearching(true);
+        setLoadError("");
+
+        const params = buildSearchParams(filters, discipline!.label);
+        const postsResponse = await searchPostsRequest(params);
+
+        if (ignore) return;
+
+        setResults(postsResponse.filter(isPublished));
+      } catch {
+        if (ignore) return;
+        setLoadError("Não foi possível carregar os conteúdos desta disciplina neste momento.");
+      } finally {
+        if (!ignore) {
+          setSearching(false);
+        }
+      }
+    }
+
+    void loadResults();
+
+    return () => {
+      ignore = true;
+    };
+  }, [discipline, filters, postId]);
+
   const disciplinePosts = useMemo(
-    () => (discipline ? posts.filter((post) => post.discipline._id === discipline._id) : []),
-    [discipline, posts],
+    () => (discipline ? catalogPosts.filter((post) => post.discipline._id === discipline._id) : []),
+    [catalogPosts, discipline],
   );
 
   const seriesOptions = useMemo(() => buildSeriesOptions(disciplinePosts), [disciplinePosts]);
@@ -99,8 +135,8 @@ export default function Discipline() {
   const professorOptions = useMemo(() => buildProfessorOptions(disciplinePosts), [disciplinePosts]);
 
   const filteredPosts = useMemo(
-    () => sortPosts(applyPostFilters(disciplinePosts, filters), sortOrder),
-    [disciplinePosts, filters, sortOrder],
+    () => sortPosts(applyPostFilters(results, filters), sortOrder),
+    [filters, results, sortOrder],
   );
 
   const pageResult = useMemo(
@@ -155,9 +191,11 @@ export default function Discipline() {
             <div>
               <h1 className="text-2xl font-bold text-slate-900">{discipline.label}</h1>
               <p aria-live="polite" className="mt-1 text-sm text-slate-500">
-                {pageResult.total === 1
-                  ? "1 post encontrado"
-                  : `${pageResult.total} posts encontrados`}
+                {searching
+                  ? "Buscando..."
+                  : pageResult.total === 1
+                    ? "1 post encontrado"
+                    : `${pageResult.total} posts encontrados`}
               </p>
             </div>
 

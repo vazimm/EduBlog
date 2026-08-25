@@ -64,8 +64,6 @@ export function buildProfessorOptions(posts: IPost[]) {
 }
 
 export function applyPostFilters(posts: IPost[], filters: IPostFilters) {
-  const search = normalizeText(filters.search);
-
   return posts.filter((post) => {
     const matchesSeries =
       filters.series.length === 0 ||
@@ -75,19 +73,18 @@ export function applyPostFilters(posts: IPost[], filters: IPostFilters) {
       filters.semesters.length === 0 ||
       filters.semesters.some((value) => normalizeText(value) === normalizeText(post.semester));
 
-    const matchesProfessor =
-      filters.professor.length === 0 ||
-      normalizeText(filters.professor) === normalizeText(post.author.name);
-
-    const matchesSearch =
-      search.length === 0 ||
-      normalizeText(post.title).includes(search) ||
-      normalizeText(post.summary).includes(search) ||
-      normalizeText(post.author.name).includes(search) ||
-      normalizeText(post.discipline.label).includes(search);
-
-    return matchesSeries && matchesSemester && matchesProfessor && matchesSearch;
+    return matchesSeries && matchesSemester;
   });
+}
+
+export function buildSearchParams(filters: IPostFilters, disciplineLabel?: string) {
+  const params = new URLSearchParams();
+
+  if (disciplineLabel) params.set("discipline", disciplineLabel);
+  if (filters.professor) params.set("author", filters.professor);
+  if (filters.search) params.set("q", filters.search);
+
+  return params;
 }
 
 export function sortPosts(posts: IPost[], order: SortOrder) {

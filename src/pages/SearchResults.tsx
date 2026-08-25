@@ -9,10 +9,11 @@ import LoadingState from "../components/ui/LoadingState";
 import Pagination from "../components/ui/Pagination";
 import { usePostFilters } from "../hooks/usePostFilters";
 import type { IPost } from "../interfaces/IPost";
-import { getPostsRequest } from "../services/postService";
+import { getPostsRequest, searchPostsRequest } from "../services/postService";
 import {
   applyPostFilters,
   buildProfessorOptions,
+  buildSearchParams,
   buildSemesterOptions,
   buildSeriesOptions,
   isPublished,
@@ -37,14 +38,16 @@ export default function SearchResults() {
     clearFilters,
   } = usePostFilters();
 
-  const [posts, setPosts] = useState<IPost[]>([]);
+  const [catalogPosts, setCatalogPosts] = useState<IPost[]>([]);
+  const [results, setResults] = useState<IPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searching, setSearching] = useState(false);
   const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
     let ignore = false;
 
-    async function loadSearchData() {
+    async function loadCatalogData() {
       try {
         setLoading(true);
         setLoadError("");
@@ -53,7 +56,7 @@ export default function SearchResults() {
 
         if (ignore) return;
 
-        setPosts(postsResponse.filter(isPublished));
+        setCatalogPosts(postsResponse.filter(isPublished));
       } catch {
         if (ignore) return;
         setLoadError("Não foi possível carregar os resultados da busca neste momento.");
@@ -64,20 +67,50 @@ export default function SearchResults() {
       }
     }
 
-    void loadSearchData();
+    void loadCatalogData();
 
     return () => {
       ignore = true;
     };
   }, []);
 
-  const seriesOptions = useMemo(() => buildSeriesOptions(posts), [posts]);
-  const semesterOptions = useMemo(() => buildSemesterOptions(posts), [posts]);
-  const professorOptions = useMemo(() => buildProfessorOptions(posts), [posts]);
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadResults() {
+      try {
+        setSearching(true);
+        setLoadError("");
+
+        const postsResponse = await searchPostsRequest(buildSearchParams(filters));
+
+        if (ignore) return;
+
+        setResults(postsResponse.filter(isPublished));
+      } catch {
+        if (ignore) return;
+        setLoadError("Não foi possível carregar os resultados da busca neste momento.");
+      } finally {
+        if (!ignore) {
+          setSearching(false);
+        }
+      }
+    }
+
+    void loadResults();
+
+    return () => {
+      ignore = true;
+    };
+  }, [filters]);
+
+  const seriesOptions = useMemo(() => buildSeriesOptions(catalogPosts), [catalogPosts]);
+  const semesterOptions = useMemo(() => buildSemesterOptions(catalogPosts), [catalogPosts]);
+  const professorOptions = useMemo(() => buildProfessorOptions(catalogPosts), [catalogPosts]);
 
   const filteredPosts = useMemo(
-    () => sortPosts(applyPostFilters(posts, filters), sortOrder),
-    [filters, posts, sortOrder],
+    () => sortPosts(applyPostFilters(results, filters), sortOrder),
+    [filters, results, sortOrder],
   );
 
   const pageResult = useMemo(
@@ -115,16 +148,18 @@ export default function SearchResults() {
                 {filters.search ? `Resultados para "${filters.search}"` : "Todos os conteúdos"}
               </h1>
               <p aria-live="polite" className="mt-1 text-sm text-slate-500">
-                {pageResult.total === 1
-                  ? "1 post encontrado"
-                  : `${pageResult.total} posts encontrados`}
+                {searching
+                  ? "Buscando..."
+                  : pageResult.total === 1
+                    ? "1 post encontrado"
+                    : `${pageResult.total} posts encontrados`}
               </p>
             </div>
 
             <ViewToggle viewMode={viewMode} onChange={setViewMode} />
           </div>
 
-          {posts.length === 0 ? (
+          {catalogPosts.length === 0 ? (
             <EmptyState
               title="Nenhum conteúdo disponível"
               message="Ainda não há posts publicados para buscar."
