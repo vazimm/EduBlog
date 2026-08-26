@@ -38,12 +38,12 @@ export default function Footer() {
           <h3 className="mb-3 text-white font-semibold">Links</h3>
           <ul className="space-y-2">
             <li>
-              <Link to="/privacidade" className="hover:text-white">
+              <Link to="/politica-de-privacidade" className="hover:text-white">
                 Política de privacidade
               </Link>
             </li>
             <li>
-              <Link to="/termos" className="hover:text-white">
+              <Link to="/termos-de-uso" className="hover:text-white">
                 Termos de uso
               </Link>
             </li>

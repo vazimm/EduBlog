@@ -29,6 +29,15 @@ export default function UserMenu() {
 
       {open && (
         <div className="absolute right-0 top-[115%] z-20 w-[170px] overflow-hidden rounded-[10px] border border-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.08)]">
+          {user?.role === "PROFESSOR" && (
+            <Link
+              to="/professor/dashboard"
+              onClick={() => setOpen(false)}
+              className="block px-3 py-2 text-sm text-slate-700 hover:bg-teal-50"
+            >
+              Painel do Professor
+            </Link>
+          )}
           <Link
             to="/perfil"
             onClick={() => setOpen(false)}
@@ -45,7 +54,7 @@ export default function UserMenu() {
           </Link>
           <button
             onClick={handleLogout}
-            className="block w-full cursor-pointer px-3 py-2 text-left text-sm text-red-700 hover:bg-red-50"
+            className="block w-full cursor-pointer px-3 py-2 text-left text-sm text-slate-700 hover:bg-teal-50"
           >
             Sair
           </button>

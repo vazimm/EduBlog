@@ -1,12 +1,21 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import Layout from "../components/layout/Layout";
+import TeacherAreaLayout from "../components/layout/TeacherAreaLayout";
 import Discipline from "../pages/Discipline";
 import Home from "../pages/Home";
 import PostView from "../pages/PostView";
 import SearchResults from "../pages/SearchResults";
 import Login from "../pages/Login";
+import About from "../pages/About";
+import Teachers from "../pages/Teachers";
+import Methodology from "../pages/Methodology";
+import PrivacyPolicy from "../pages/PrivacyPolicy";
+import TermsOfUse from "../pages/TermsOfUse";
+import TeacherDashboard from "../pages/TeacherDashboard";
+import TeacherPosts from "../pages/TeacherPosts";
 import RequireAuth from "./RequireAuth";
 import NotFound from "../pages/NotFound";
+import RequireRole from "./RequireRole";
 
 //import RequireRole from "./RequireRole";
 //import PostCreate from "../pages/PostCreate";
@@ -27,6 +36,11 @@ const router = createBrowserRouter([
           { path: "/posts/:id", element: <PostView /> },
           { path: "/busca", element: <SearchResults /> },
           { path: "*", element: <NotFound /> },
+          { path: "/sobre", element: <About /> },
+          { path: "/professores", element: <Teachers /> },
+          { path: "/metodologia", element: <Methodology /> },
+          { path: "/politica-de-privacidade", element: <PrivacyPolicy /> },
+          { path: "/termos-de-uso", element: <TermsOfUse /> },
 
           // Quando criar PostCreate/PostEdit/Admin, descomente este bloco:
           // {
@@ -37,6 +51,19 @@ const router = createBrowserRouter([
           //     { path: "/admin", element: <Admin /> },
           //   ],
           // },
+        ],
+      },
+      {
+        element: <RequireRole role="PROFESSOR" />,
+        children: [
+          {
+            element: <TeacherAreaLayout />,
+            children: [
+              { path: "/professor", element: <Navigate to="/professor/dashboard" replace /> },
+              { path: "/professor/dashboard", element: <TeacherDashboard /> },
+              { path: "/professor/posts", element: <TeacherPosts /> },
+            ],
+          },
         ],
       },
     ],
