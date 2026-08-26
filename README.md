@@ -18,6 +18,7 @@ Projeto desenvolvido para o **Tech Challenge** — [nome da pós-graduação/cur
 - [Stack e principais decisões técnicas](#stack-e-principais-decisões-técnicas)
 - [Pré-requisitos](#pré-requisitos)
 - [Configuração do ambiente](#configuração-do-ambiente)
+- [Configuração do ambiente Docker](#rodando-com-Docker)
 - [Rodando o projeto](#rodando-o-projeto)
 - [Rodando com Docker](#rodando-com-docker)
 - [Estrutura de pastas](#estrutura-de-pastas)
@@ -74,12 +75,118 @@ VITE_API_URL=http://localhost:3000
 
 > Todas as variáveis consumidas pelo Vite precisam começar com o prefixo `VITE_`. Elas são embutidas no bundle final durante o build — nunca coloque segredos aqui (chaves privadas, `JWT_SECRET`, etc.), pois ficam visíveis no código-fonte enviado ao navegador.
 
+## Rodando com Docker
+
+O projeto possui dois modos de execução através do Docker Compose:
+
+- **Desenvolvimento (`frontend-dev`)**: executa o Vite com hot-reload, indicado para desenvolvimento local.
+- **Produção (`frontend-prod`)**: gera o build otimizado da aplicação e o serve através do Nginx.
+
+### Desenvolvimento
+
+Para iniciar somente o ambiente de desenvolvimento:
+
+```bash
+docker compose up --build -d frontend-dev
+```
+
+Ou
+
+```bash
+docker compose --profile dev up --build -d
+```
+
+A aplicação ficará disponível em:
+
+```text
+http://localhost:5173
+```
+
+O serviço utiliza volume do projeto e hot-reload, permitindo que alterações no código sejam refletidas no container sem a necessidade de recriá-lo a cada alteração.
+
+Para visualizar os logs:
+
+```bash
+docker compose logs -f frontend-dev
+```
+
+Para parar o serviço:
+
+```bash
+docker compose stop frontend-dev
+```
+
+### Produção
+
+Para gerar a imagem de produção e iniciar o container:
+
+```bash
+docker compose up --build -d frontend-prod
+```
+
+A aplicação ficará disponível em:
+
+```text
+http://localhost:8080
+```
+
+Nesse modo, o projeto é compilado pelo Node.js e os arquivos gerados em `dist/` são servidos pelo Nginx.
+
+Para visualizar os logs:
+
+```bash
+docker compose logs -f frontend-prod
+```
+
+Para parar o serviço:
+
+```bash
+docker compose stop frontend-prod
+```
+
+### Executando os dois ambientes
+
+Também é possível iniciar os dois serviços simultaneamente:
+
+```bash
+docker compose up --build -d
+```
+
+Nesse caso:
+
+| Serviço         | URL                     | Uso                                  |
+| --------------- | ----------------------- | ------------------------------------ |
+| `frontend-dev`  | `http://localhost:5173` | Desenvolvimento com hot-reload       |
+| `frontend-prod` | `http://localhost:8080` | Build de produção servido pelo Nginx |
+
+Para verificar os containers em execução:
+
+```bash
+docker compose ps
+```
+
+Para parar todos os serviços:
+
+```bash
+docker compose down
+```
+
+> **Observação:** `docker compose up --build -d` inicia todos os serviços definidos no `docker-compose.yml`. Para iniciar apenas um ambiente, informe o nome do serviço (`frontend-dev` ou `frontend-prod`).
+
+### Desenvolvimento
+
+Para iniciar somente o ambiente de desenvolvimento:
+
+````bash
+docker compose up --build -d frontend-dev
+
+
 ## Rodando o projeto
 
 ```bash
 npm install
 npm run dev
-```
+````
 
 Acesse em `http://localhost:5173`.
 
