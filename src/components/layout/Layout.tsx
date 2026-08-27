@@ -6,7 +6,7 @@ export default function Layout() {
   return (
     <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top_left,_#e8fff8,_#f5f7fb_45%)] text-slate-800">
       <Header />
-      <main className="grow">
+      <main className="flex grow flex-col">
         <Outlet />
       </main>
       <Footer />

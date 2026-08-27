@@ -1,13 +1,4 @@
-type ConfirmModalProps = {
-  isOpen: boolean;
-  title: string;
-  description: string;
-  confirmLabel?: string;
-  cancelLabel?: string;
-  isLoading?: boolean;
-  onConfirm: () => void;
-  onCancel: () => void;
-};
+import type { ConfirmModalProps } from "../../types/confirmModal";
 
 export default function ConfirmModal({
   isOpen,

@@ -17,11 +17,6 @@ import RequireAuth from "./RequireAuth";
 import NotFound from "../pages/NotFound";
 import RequireRole from "./RequireRole";
 
-//import RequireRole from "./RequireRole";
-//import PostCreate from "../pages/PostCreate";
-//import PostEdit from "../pages/PostEdit";
-//import Admin from "../pages/Admin";
-
 const router = createBrowserRouter([
   { path: "/login", element: <Login /> },
 
@@ -42,26 +37,17 @@ const router = createBrowserRouter([
           { path: "/politica-de-privacidade", element: <PrivacyPolicy /> },
           { path: "/termos-de-uso", element: <TermsOfUse /> },
 
-          // Quando criar PostCreate/PostEdit/Admin, descomente este bloco:
-          // {
-          //   element: <RequireRole role="professor" />,
-          //   children: [
-          //     { path: "/posts/new", element: <PostCreate /> },
-          //     { path: "/posts/:id/edit", element: <PostEdit /> },
-          //     { path: "/admin", element: <Admin /> },
-          //   ],
-          // },
-        ],
-      },
-      {
-        element: <RequireRole role="PROFESSOR" />,
-        children: [
           {
-            element: <TeacherAreaLayout />,
+            element: <RequireRole role="PROFESSOR" />,
             children: [
-              { path: "/professor", element: <Navigate to="/professor/dashboard" replace /> },
-              { path: "/professor/dashboard", element: <TeacherDashboard /> },
-              { path: "/professor/posts", element: <TeacherPosts /> },
+              {
+                element: <TeacherAreaLayout />,
+                children: [
+                  { path: "/professor", element: <Navigate to="/professor/dashboard" replace /> },
+                  { path: "/professor/dashboard", element: <TeacherDashboard /> },
+                  { path: "/professor/posts", element: <TeacherPosts /> },
+                ],
+              },
             ],
           },
         ],

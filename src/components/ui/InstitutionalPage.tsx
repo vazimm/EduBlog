@@ -1,13 +1,4 @@
-type InstitutionalSection = {
-  title: string;
-  paragraphs: string[];
-};
-
-type InstitutionalPageProps = {
-  title: string;
-  subtitle: string;
-  sections: InstitutionalSection[];
-};
+import type { InstitutionalPageProps } from "../../types/institutionalPage";
 
 export default function InstitutionalPage({
   title,
