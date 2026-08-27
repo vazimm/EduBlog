@@ -54,7 +54,7 @@ export default function UserMenu() {
           </Link>
           <button
             onClick={handleLogout}
-            className="block w-full cursor-pointer px-3 py-2 text-left text-sm text-slate-700 hover:bg-teal-50"
+            className="block w-full cursor-pointer px-3 py-2 text-left text-sm text-red-700 hover:bg-red-50"
           >
             Sair
           </button>
