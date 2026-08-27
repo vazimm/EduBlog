@@ -10,7 +10,6 @@ import type { SearchSuggestion } from "../../types/searchSuggestion";
 import { normalizeText, slugifyDisciplineLabel } from "../../utils/discipline";
 import { isPublished } from "../../utils/filters";
 import { useLocation } from "react-router-dom";
-import TeacherMenu from "./TeacherMenu";
 import UserMenu from "./UserMenu";
 
 export default function Header() {
@@ -171,7 +170,7 @@ export default function Header() {
   }
 
   const isListboxOpen = isSearchOpen && normalizedQuery.length > 0;
-  const isTeacherRoute = location.pathname.startsWith("/professor");
+  const isTeacherRoute = location.pathname === "/professor" || location.pathname.startsWith("/professor/");
 
   return (
     <>
@@ -272,19 +271,12 @@ export default function Header() {
             </form>
           )}
 
-          {isTeacherRoute ? (
-            <nav className="justify-self-end">
-              <ul className="flex items-center gap-4 text-black">
-                <TeacherMenu />
-              </ul>
-            </nav>
-          ) : (
-            <nav className="justify-self-end">
-              <ul className="flex items-center gap-4 text-black">
-                <UserMenu />
-              </ul>
-            </nav>
-          )}
+          <nav className="justify-self-end">
+            <ul className="flex items-center gap-4 text-black">
+              <UserMenu />
+            </ul>
+          </nav>
+          
         </div>
       </header>
 
