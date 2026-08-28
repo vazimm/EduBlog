@@ -19,3 +19,7 @@ export async function getPostByIdRequest(id: string) {
   const response = await api.get<{ data: IPost }>(`/posts/${id}`);
   return response.data.data;
 }
+
+export async function deletePostRequest(postId: string) {
+  await api.delete(`/posts/${postId}`);
+}
