@@ -4,6 +4,11 @@ export interface ILoadingStateProps {
   message: string;
 }
 
+export interface ILoadingDotsProps {
+  text?: string;
+  className?: string;
+}
+
 export interface IErrorStateProps {
   title: string;
   message: string;

@@ -32,7 +32,9 @@ export default function FilterPanel({
 
       {professorOptions.length > 0 && (
         <fieldset className="mt-5">
-          <legend className="text-sm font-bold text-slate-900">Professor</legend>
+          <legend className="text-sm font-bold text-slate-900">
+            Professor
+          </legend>
 
           <select
             value={filters.professor}
