@@ -22,6 +22,8 @@ export default function Header() {
     location.pathname.startsWith("/professor/");
 
   useEffect(() => {
+    if (isTeacherRoute) return;
+
     let ignore = false;
 
     async function loadPosts() {
@@ -43,7 +45,7 @@ export default function Header() {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [isTeacherRoute]);
 
   return (
     <>
@@ -74,7 +76,7 @@ export default function Header() {
         </div>
       </header>
 
-      {!isTeacherRoute && <DisciplineNav propsDisciplines={disciplines} />}
+      {!isTeacherRoute && <DisciplineNav disciplines={disciplines} />}
     </>
   );
 }

@@ -4,3 +4,7 @@ export interface IDiscipline {
   order: number;
   isActive: boolean;
 }
+
+export interface DisciplineNavProps {
+  disciplines: IDiscipline[];
+}

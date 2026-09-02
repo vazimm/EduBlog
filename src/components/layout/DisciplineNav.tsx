@@ -1,13 +1,9 @@
-import { Link } from "react-router-dom";
-import type { IDiscipline } from "../../interfaces/IDiscipline";
+import { NavLink } from "react-router-dom";
+import type { DisciplineNavProps } from "../../interfaces/IDiscipline";
 import { slugifyDisciplineLabel } from "../../utils/discipline";
 
-export default function DisciplineNav({
-  propsDisciplines,
-}: {
-  propsDisciplines?: IDiscipline[];
-}) {
-  if (!propsDisciplines || propsDisciplines.length === 0) {
+export default function DisciplineNav({ disciplines }: DisciplineNavProps) {
+  if (disciplines.length === 0) {
     return null;
   }
 
@@ -17,22 +13,38 @@ export default function DisciplineNav({
 
       <nav className="bg-white px-8 py-3">
         <div className="mx-auto flex max-w-6xl flex-wrap justify-center gap-4">
-          <Link
+          <NavLink
             to="/busca"
-            className="relative px-1 py-1 text-sm font-semibold text-teal-700 transition hover:text-teal-800"
+            className={({ isActive }) =>
+              `relative px-1 py-1 text-sm font-semibold transition ${
+                isActive
+                  ? "text-teal-700"
+                  : "text-slate-700 hover:text-teal-700"
+              }`
+            }
           >
             Todos
-          </Link>
+          </NavLink>
 
-          {propsDisciplines.map((discipline) => (
-            <Link
-              key={discipline._id}
-              to={`/conteudo/${slugifyDisciplineLabel(discipline.label)}`}
-              className="relative px-1 py-1 text-sm font-semibold text-slate-700 transition hover:text-teal-700"
-            >
-              {discipline.label}
-            </Link>
-          ))}
+          {disciplines.map((discipline) => {
+            const disciplineSlug = slugifyDisciplineLabel(discipline.label);
+
+            return (
+              <NavLink
+                key={discipline._id}
+                to={`/conteudo/${disciplineSlug}`}
+                className={({ isActive }) =>
+                  `relative px-1 py-1 text-sm font-semibold transition ${
+                    isActive
+                      ? "text-teal-700"
+                      : "text-slate-700 hover:text-teal-700"
+                  }`
+                }
+              >
+                {discipline.label}
+              </NavLink>
+            );
+          })}
         </div>
       </nav>
     </>
