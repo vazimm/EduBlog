@@ -3,6 +3,7 @@ import { isAxiosError } from "axios";
 import { useNavigate, useLocation, type Location } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useToast } from "../hooks/useToast";
+import { LoadingDots } from "../components/ui/LoadingDots";
 
 export default function Login() {
   const { login } = useAuth();
@@ -37,7 +38,7 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-teal-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-50 to-teal-50 px-4">
       <div className="w-full max-w-sm bg-white rounded-2xl shadow-lg border border-slate-100 p-8">
         <h1 className="text-2xl font-bold text-center text-teal-700">
           EduBlog
@@ -85,7 +86,7 @@ export default function Login() {
             className="w-full bg-teal-700 hover:bg-teal-800 disabled:opacity-60
                        text-white rounded-lg py-2 text-sm font-medium transition"
           >
-            {loading ? "Entrando..." : "Entrar"}
+            {loading ? <LoadingDots /> : "Entrar"}
           </button>
         </form>
 
